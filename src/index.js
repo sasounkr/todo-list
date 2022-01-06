@@ -10,9 +10,11 @@ class TaskInput extends React.Component {
       <div>
         <label>
           Add Task
-          <input type="text" onChange={this.props.handleTaskInput} value={this.props.value} />
+          <input type="text" 
+            onChange={this.props.handleTaskInput} 
+            value={this.props.value} />
         </label>
-        <button>CREATE</button>
+        <button onClick={this.props.handleClick}>CREATE</button>
       </div>
     );
   }
@@ -34,44 +36,36 @@ class Tab extends React.Component {
   }
 }
 
-class TodoNav extends React.Component {
-  constructor(props) {
-    super(props);
-
-
-    this.state = {
-      selectedTab: tabEnum.TODO
-    };
-
-    this.handleTabClick = this.handleTabClick.bind(this);
-  }
-  
+class TodoItem extends React.Component {
   render() {
-    switch (this.state.selectedTab) {
-      case tabEnum.TODO:
-        console.log('todo');
-        break;
-      case tabEnum.DONE:
-        console.log('done');
-        break;
-      case tabEnum.ALL:
-        console.log('all');
-        break;
-    }
+    return (
+      <li>
+        <label>
+          <input type="checkbox" />
+          {this.props.label}
+        </label>
+      </li>
+    );
+  }
+}
+
+
+class TodoNav extends React.Component {  
+  render() {
     return (
       <div>
-        <Tab message="To-Do" tabType={tabEnum.TODO} handleTabClick={this.handleTabClick(tabEnum.TODO)} />
-        <Tab message="Done" tabType={tabEnum.DONE} handleTabClick={this.handleTabClick(tabEnum.DONE)} />
-        <Tab message="All" tabType={tabEnum.ALL} handleTabClick={this.handleTabClick(tabEnum.ALL)} />
+        <Tab 
+          message="To-Do" 
+          handleTabClick={this.props.handleTabClick(tabEnum.TODO)} />
+        <Tab 
+          message="Done" 
+          handleTabClick={this.props.handleTabClick(tabEnum.DONE)} />
+        <Tab 
+          message="All" 
+          handleTabClick={this.props.handleTabClick(tabEnum.ALL)} />
       </div>
     );
   }
-
-  handleTabClick(selectedTab) {
-    return event => this.setState({selectedTab});
-  }
-
-  
 }
 
 class App extends React.Component {
@@ -79,17 +73,46 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      taskInputText: ''
+      taskInputText: '',
+      selectedTab: tabEnum.TODO,
+      todoList: [],
+      doneList: [],
+      allList: []
     }
 
     this.handleTaskInput = this.handleTaskInput.bind(this);
+    this.handleTabClick = this.handleTabClick.bind(this);
+    this.handleCreateClick = this.handleCreateClick.bind(this);
   }
   render() {
+    let itemList;
+    switch (this.state.selectedTab) {
+      case tabEnum.TODO:
+        console.log('todo');
+        itemList = [...this.state.todoList];
+        break;
+      case tabEnum.DONE:
+        console.log('done');
+        itemList = [...this.state.doneList];
+        break;
+      case tabEnum.ALL:
+        console.log('all');
+        itemList = [...this.state.allList]
+        break;
+    }
+    
+    
     return (
       <div>
         <h1>To-Do List</h1>
-        <TaskInput handleTaskInput={this.handleTaskInput} value={this.state.taskInputText} />
-        <TodoNav />
+        <TaskInput 
+          handleTaskInput={this.handleTaskInput} 
+          value={this.state.taskInputText}
+          handleClick={this.handleCreateClick} />
+        <TodoNav handleTabClick={this.handleTabClick} />
+        <ol>
+          {itemList}
+        </ol>
       </div>
     );
   }
@@ -98,6 +121,45 @@ class App extends React.Component {
     this.setState({
       taskInputText: event.target.value
     });
+  }
+
+  handleTabClick(selectedTab) {
+    if (this.state.selectedTab === selectedTab) return;
+    return event => this.setState({selectedTab});
+  }
+
+  handleCreateClick(event) {
+    // violating the DRY principle... I'm just too good for it :)
+    switch (this.state.selectedTab) {
+      case tabEnum.TODO:
+        const todoList = [...this.state.todoList];
+        todoList.push(
+          <TodoItem
+            label={this.state.taskInputText} 
+            key={todoList.length} />
+        );
+        this.setState({todoList});
+        break;
+      case tabEnum.DONE:
+        const doneList = [...this.state.doneList];
+        doneList.push(
+          <TodoItem
+            label={this.state.taskInputText} 
+            key={doneList.length} />
+        );
+        this.setState({doneList});
+        break;
+      case tabEnum.ALL:
+        const allList = [...this.state.allList];
+        allList.push(
+          <TodoItem
+            label={this.state.taskInputText} 
+            key={allList.length} />
+        );
+        this.setState({allList});
+        break;
+    }
+
   }
 }
 
