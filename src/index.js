@@ -7,9 +7,10 @@ class TaskInput extends React.Component {
   
   render() {
     return (
-      <div>
+      <div id="taskInput">
         <label>
           Add Task
+          <br />
           <input type="text" 
             onChange={this.props.handleTaskInput} 
             value={this.props.value} />
@@ -31,7 +32,9 @@ class TaskInput extends React.Component {
 class Tab extends React.Component {
   render() {
     return (
-        <button onClick={this.props.handleTabClick}>{this.props.message}</button>
+        <button 
+        className='tab'
+        onClick={this.props.handleTabClick}>{this.props.message}</button>
     )
   }
 }
@@ -56,15 +59,15 @@ class TodoItem extends React.Component {
 class TodoNav extends React.Component {  
   render() {
     return (
-      <div>
+      <div id="tabs">
         <Tab 
-          message="To-Do" 
+          message="TO DO" 
           handleTabClick={this.props.handleTabClick(tabEnum.TODO)} />
         <Tab 
-          message="Done" 
+          message="DONE" 
           handleTabClick={this.props.handleTabClick(tabEnum.DONE)} />
         <Tab 
-          message="All" 
+          message="ALL" 
           handleTabClick={this.props.handleTabClick(tabEnum.ALL)} />
       </div>
     );
@@ -94,17 +97,19 @@ class App extends React.Component {
       }
     })
     
-      
+    let todoList = itemList.filter(item => !item.checked);
+    let doneList = itemList.filter(item => item.checked);
+    let allListSize = todoList.length + doneList.length;
     
     switch (this.state.selectedTab) {
       case tabEnum.TODO:
         console.log('todo')
-        itemList = itemList.filter(item => !item.checked);
+        itemList = todoList;
         break;
 
       case tabEnum.DONE:
         console.log('done')
-        itemList = itemList.filter(item => item.checked);
+        itemList = doneList;
         break;
 
       case tabEnum.ALL:
@@ -126,12 +131,24 @@ class App extends React.Component {
     
     return (
       <div>
-        <h1>To-Do List</h1>
+        <div id="header">
+          <span >To-Do List</span>
+        </div>
         <TaskInput 
           handleTaskInput={this.handleTaskInput} 
           value={this.state.taskInputText}
           handleClick={this.handleCreateClick} />
-        <TodoNav handleTabClick={this.handleTabClick} />
+              <div id="tabs">
+        <Tab 
+          message={`TO DO (${todoList.length})`} 
+          handleTabClick={this.handleTabClick(tabEnum.TODO)} />
+        <Tab 
+          message={`DONE (${doneList.length})`}
+          handleTabClick={this.handleTabClick(tabEnum.DONE)} />
+        <Tab 
+          message={`ALL (${allListSize})`} 
+          handleTabClick={this.handleTabClick(tabEnum.ALL)} />
+      </div>
         <ol>
           {itemListComp}
         </ol>
@@ -151,20 +168,11 @@ class App extends React.Component {
   }
 
   handleCreateClick(event) {
-    // violating the DRY principle... I'm just too good for it :)
     const todoList = [...this.state.todoList]
     todoList.push({
       label: this.state.taskInputText,
       checked: false
     });
-    // todoList.push(
-    //   <TodoItem
-    //     label={this.state.taskInputText}
-    //     key={todoList.length}
-    //     listId={todoList.length}
-    //     checked={false} 
-    //     handleCheckClick={this.handleCheckClick} />
-    // );
     console.log(todoList);
     this.setState({todoList});
   }
