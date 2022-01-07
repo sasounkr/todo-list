@@ -26,4 +26,16 @@ html, body, #root, head {
 
 .tab {
     width: 100%;
+    border-style: none;
+    background-color: rgb(0, 172, 172);
+    color: white;
+    cursor: pointer;
+}
+
+#create {
+    border-style: solid;
+    border-radius: 2px;
+    border-color: gainsboro;
+    background-color: white;
+    cursor: pointer;
 }

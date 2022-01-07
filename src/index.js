@@ -15,7 +15,7 @@ class TaskInput extends React.Component {
             onChange={this.props.handleTaskInput} 
             value={this.props.value} />
         </label>
-        <button onClick={this.props.handleClick}>CREATE</button>
+        <button id="create" onClick={this.props.handleClick}>CREATE</button>
       </div>
     );
   }
