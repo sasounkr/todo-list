@@ -41,7 +41,10 @@ class TodoItem extends React.Component {
     return (
       <li>
         <label>
-          <input type="checkbox" />
+          <input 
+            type="checkbox"
+            checked={this.props.checked} 
+            onChange={this.props.handleCheckClick(this.props.listId)} />
           {this.props.label}
         </label>
       </li>
@@ -75,32 +78,51 @@ class App extends React.Component {
     this.state = {
       taskInputText: '',
       selectedTab: tabEnum.TODO,
-      todoList: [],
-      doneList: [],
-      allList: []
+      todoList: []
     }
 
     this.handleTaskInput = this.handleTaskInput.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleCreateClick = this.handleCreateClick.bind(this);
+    this.handleCheckClick = this.handleCheckClick.bind(this);
   }
   render() {
-    let itemList;
+    let itemList = this.state.todoList.map((item, listId) => {
+      return {
+        ...item,
+        listId
+      }
+    })
+    
+      
+    
     switch (this.state.selectedTab) {
       case tabEnum.TODO:
-        console.log('todo');
-        itemList = [...this.state.todoList];
+        console.log('todo')
+        itemList = itemList.filter(item => !item.checked);
         break;
+
       case tabEnum.DONE:
-        console.log('done');
-        itemList = [...this.state.doneList];
+        console.log('done')
+        itemList = itemList.filter(item => item.checked);
         break;
+
       case tabEnum.ALL:
-        console.log('all');
-        itemList = [...this.state.allList]
+        console.log('all')
+        // do nothing
         break;
     }
-    
+
+    let itemListComp = itemList.map((item) => {
+      return (
+        <TodoItem
+          label={item.label}
+          key={item.listId}
+          listId={item.listId}
+          checked={item.checked} 
+          handleCheckClick={this.handleCheckClick} />
+      )
+    })
     
     return (
       <div>
@@ -111,7 +133,7 @@ class App extends React.Component {
           handleClick={this.handleCreateClick} />
         <TodoNav handleTabClick={this.handleTabClick} />
         <ol>
-          {itemList}
+          {itemListComp}
         </ol>
       </div>
     );
@@ -130,36 +152,31 @@ class App extends React.Component {
 
   handleCreateClick(event) {
     // violating the DRY principle... I'm just too good for it :)
-    switch (this.state.selectedTab) {
-      case tabEnum.TODO:
-        const todoList = [...this.state.todoList];
-        todoList.push(
-          <TodoItem
-            label={this.state.taskInputText} 
-            key={todoList.length} />
-        );
-        this.setState({todoList});
-        break;
-      case tabEnum.DONE:
-        const doneList = [...this.state.doneList];
-        doneList.push(
-          <TodoItem
-            label={this.state.taskInputText} 
-            key={doneList.length} />
-        );
-        this.setState({doneList});
-        break;
-      case tabEnum.ALL:
-        const allList = [...this.state.allList];
-        allList.push(
-          <TodoItem
-            label={this.state.taskInputText} 
-            key={allList.length} />
-        );
-        this.setState({allList});
-        break;
-    }
+    const todoList = [...this.state.todoList]
+    todoList.push({
+      label: this.state.taskInputText,
+      checked: false
+    });
+    // todoList.push(
+    //   <TodoItem
+    //     label={this.state.taskInputText}
+    //     key={todoList.length}
+    //     listId={todoList.length}
+    //     checked={false} 
+    //     handleCheckClick={this.handleCheckClick} />
+    // );
+    console.log(todoList);
+    this.setState({todoList});
+  }
 
+  handleCheckClick(listId) {
+    return (event) => {
+      let todoList = [...this.state.todoList];
+      console.log(listId);
+      console.log(todoList[listId]);
+      todoList[listId].checked = !todoList[listId].checked;
+      this.setState({todoList})
+    };
   }
 }
 
